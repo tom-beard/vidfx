@@ -23,23 +23,26 @@ sample_frame %>% plot()
 
 # adapted from examples at https://dahtah.github.io/imager/gettingstarted.html
 
-Hdet <- with(imhessian(sample_frame), (xx * yy - xy^2))
-Hdet %>% plot(main = "Determinant of Hessian")
+get_centres <- function(im, this_thresh = 0.01, sigma = 0) {
+  im %>% 
+    isoblur(sigma) %>% 
+    imhessian() %$%
+    { xx * yy - xy^2 } %>%
+    threshold(glue("{100 * (1 - this_thresh)}%")) %>%
+    label() %>%
+    as.data.frame() %>%
+    as_tibble() %>%
+    filter(value > 0) %>% 
+    group_by(value) %>% 
+    summarise(mx = mean(x), my = mean(y))
+}
 
-this_thresh <- 0.001
-thresh_text <- glue("{100 * (1 - this_thresh)}%")
-threshold(Hdet, thresh_text) %>%
-  plot(main = glue("Determinant: {100 * this_thresh}% highest values"))
-
-lab <- threshold(Hdet, thresh_text) %>% label()
-plot(lab)
-
-df <- lab %>% as.data.frame() %>% as_tibble() %>% filter(value > 0)
-# unique(df$value)
-centres <- df %>% 
-  group_by(value) %>% 
-  summarise(mx = mean(x), my = mean(y))
 plot(sample_frame)
-with(centres, points(mx, my, col = "red"))
+with(get_centres(sample_frame), points(mx, my, col = "yellow"))
+with(get_centres(sample_frame, 0.001), points(mx, my, col = "red"))
+with(get_centres(sample_frame, 0.001, sigma = 2), points(mx, my, col = "white"))
 
+plot(sample_frame)
+with(get_centres(sample_frame, 0.001, sigma = 2), points(mx, my, col = "yellow"))
+with(get_centres(sample_frame, 0.001, sigma = 4), points(mx, my, col = "red"))
 
