@@ -58,3 +58,29 @@ plot(sample_frame)
 with(get_centres(sample_frame, 0.001, sigma = 2), points(mx, my, col = "yellow"))
 with(get_centres(sample_frame, 0.001, sigma = 4), points(mx, my, col = "red"))
 
+
+# multi-level blob detection ----------------------------------------------
+
+# to do
+
+
+# add Delaunay triangulation ----------------------------------------------
+
+regions <- get_centres(sample_frame, 0.001, sigma = 4)
+
+# would be nice to add a wrapper so that deldir() takes a tibble as an argument!
+delaunay <- deldir::deldir(regions$mx, regions$my)
+# View(delaunay)
+
+sample_frame %>%
+  as.data.frame() %>% 
+  ggplot(aes(x, y)) +
+  geom_raster(aes(fill = value)) +
+  geom_segment(data = delaunay$delsgs, aes(x = x1, y = y1, xend = x2, yend = y2),
+               colour = "yellow", alpha = 0.5) +
+  geom_point(data = regions,
+             aes(mx, my), colour = "red") +
+  scale_fill_gradient(low = "black", high = "white") +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0,0), trans = scales::reverse_trans())
+
