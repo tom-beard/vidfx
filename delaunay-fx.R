@@ -66,10 +66,10 @@ with(get_centres(sample_frame, 0.001, sigma = 4), points(mx, my, col = "red"))
 
 # add Delaunay triangulation ----------------------------------------------
 
-regions <- get_centres(sample_frame, 0.001, sigma = 4)
+centres_df <- get_centres(sample_frame, threshold = 0.001, sigma = 4)
 
 # would be nice to add a wrapper so that deldir() takes a tibble as an argument!
-delaunay <- deldir::deldir(regions$mx, regions$my)
+delaunay <- deldir::deldir(centres_df$mx, centres_df$my)
 # View(delaunay)
 
 sample_frame %>%
@@ -78,9 +78,9 @@ sample_frame %>%
   geom_raster(aes(fill = value)) +
   geom_segment(data = delaunay$delsgs, aes(x = x1, y = y1, xend = x2, yend = y2),
                colour = "yellow", alpha = 0.5) +
-  geom_point(data = regions,
+  geom_point(data = centres_df,
              aes(mx, my), colour = "red") +
   scale_fill_gradient(low = "black", high = "white") +
   scale_x_continuous(expand = c(0, 0)) +
-  scale_y_continuous(expand = c(0,0), trans = scales::reverse_trans())
+  scale_y_continuous(expand = c(0, 0), trans = scales::reverse_trans())
 
