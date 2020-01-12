@@ -23,21 +23,30 @@ sample_frame %>% plot()
 
 # adapted from examples at https://dahtah.github.io/imager/gettingstarted.html
 
+
+hessdet <- function(im, scale = 1) {
+  im %>% 
+    isoblur(scale) %>%
+    imhessian() %$%
+    {scale^2 * (xx * yy - xy^2)}
+}
+
+
 #' Find the coordinates of each blob in the image.
 #'
 #' @param im A grayscale image of type cimg
 #' @param this_thresh Quantile for the threshold stage (default 0.01 selects the top 1%)
-#' @param sigma Standard deviation of the blur to apply before blob detection
+#' @param scale Standard deviation of the blur to apply before blob detection
 #'
 #' @return A tibble with a row for each blob, and columns named `value` (the numerical label for the blob),
 #'   `mx` (x value for the centre of the blob) and `my` (y value for the centre of the blob).
 #'
 #' @examples
 #' imname <- system.file('extdata/parrots.png', package = 'imager')
-#' points <- load.image(imname) %>% grayscale %>% get_centres(sigma = 2)
-get_centres <- function(im, this_thresh = 0.01, sigma = 0) {
+#' points <- load.image(imname) %>% grayscale %>% get_centres(scale = 2)
+get_centres <- function(im, this_thresh = 0.01, scale = 1) {
   im %>% 
-    isoblur(sigma) %>% 
+    isoblur(scale) %>% 
     imhessian() %$%
     { xx * yy - xy^2 } %>%
     threshold(glue::glue("{100 * (1 - this_thresh)}%")) %>%
@@ -52,11 +61,11 @@ get_centres <- function(im, this_thresh = 0.01, sigma = 0) {
 plot(sample_frame)
 with(get_centres(sample_frame), points(mx, my, col = "yellow"))
 with(get_centres(sample_frame, 0.001), points(mx, my, col = "red"))
-with(get_centres(sample_frame, 0.001, sigma = 2), points(mx, my, col = "white"))
+with(get_centres(sample_frame, 0.001, scale = 2), points(mx, my, col = "white"))
 
 plot(sample_frame)
-with(get_centres(sample_frame, 0.001, sigma = 2), points(mx, my, col = "yellow"))
-with(get_centres(sample_frame, 0.001, sigma = 4), points(mx, my, col = "red"))
+with(get_centres(sample_frame, 0.001, scale = 2), points(mx, my, col = "yellow"))
+with(get_centres(sample_frame, 0.001, scale = 4), points(mx, my, col = "red"))
 
 
 # multi-level blob detection ----------------------------------------------
