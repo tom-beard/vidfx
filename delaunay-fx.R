@@ -68,7 +68,17 @@ with(get_centres(sample_frame, 0.001, scale = 4), points(mx, my, col = "red"))
 
 # multi-level blob detection ----------------------------------------------
 
-# to do
+max_hessdet <- function( im, scales = seq(from = max(dim(im)[1:2]) %/% 200,
+                                          to = max(dim(im)[1:2]) %/% 8,
+                                          by = 1)
+                         ) {
+  scales %>%
+    map(~ hessdet(im, .)) %>%
+    which.parmax()
+}
+
+i_max <- sample_frame %>% max_hessdet(seq(12, 100, by = 1))
+i_max %>% plot(main = "Index of point-wise max\nacross scales")
 
 
 # add Delaunay triangulation ----------------------------------------------
