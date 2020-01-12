@@ -44,7 +44,7 @@ hessdet <- function(im, scale = 1) {
 #' @examples
 #' imname <- system.file('extdata/parrots.png', package = 'imager')
 #' points <- load.image(imname) %>% grayscale %>% get_centres(scale = 2)
-get_centres <- function(im, this_thresh = 0.01, scale = 1) {
+get_centres <- function(im, threshold = 0.01, scale = 1) {
   im %>% 
     isoblur(scale) %>% 
     imhessian() %$%
@@ -75,7 +75,7 @@ with(get_centres(sample_frame, 0.001, scale = 4), points(mx, my, col = "red"))
 
 # add Delaunay triangulation ----------------------------------------------
 
-centres_df <- get_centres(sample_frame, threshold = 0.001, sigma = 4)
+centres_df <- get_centres(sample_frame, threshold = 0.001, scale = 4)
 
 # would be nice to add a wrapper so that deldir() takes a tibble as an argument!
 delaunay <- deldir::deldir(centres_df$mx, centres_df$my)
