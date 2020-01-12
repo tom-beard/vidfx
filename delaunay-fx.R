@@ -46,10 +46,8 @@ hessdet <- function(im, scale = 1) {
 #' points <- load.image(imname) %>% grayscale %>% get_centres(scale = 2)
 get_centres <- function(im, threshold = 0.01, scale = 1) {
   im %>% 
-    isoblur(scale) %>% 
-    imhessian() %$%
-    { xx * yy - xy^2 } %>%
-    threshold(glue::glue("{100 * (1 - this_thresh)}%")) %>%
+    hessdet(scale) %>% 
+    threshold(glue::glue("{100 * (1 - threshold)}%")) %>%
     label() %>%
     as.data.frame() %>%
     as_tibble() %>%
