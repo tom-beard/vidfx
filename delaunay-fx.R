@@ -83,9 +83,13 @@ i_max %>% plot(main = "Index of point-wise max\nacross scales")
 
 centres_df <- get_centres(sample_frame, threshold = 0.001, scale = 4)
 
-# would be nice to add a wrapper so that deldir() takes a tibble as an argument!
-delaunay <- deldir::deldir(centres_df$mx, centres_df$my)
-# View(delaunay)
+# a wrapper so that deldir() takes a tibble as an argument
+# next steps: add options to return one of the main objects as a tibble
+deldir_tidy <- function(df) {
+  deldir::deldir(df$mx, df$my)
+}
+
+delaunay <- centres_df %>% deldir_tidy()
 
 sample_frame %>%
   as.data.frame() %>% 
