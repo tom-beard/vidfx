@@ -23,14 +23,12 @@ sample_frame %>% plot()
 
 # adapted from examples at https://dahtah.github.io/imager/gettingstarted.html
 
-
 hessdet <- function(im, scale = 1) {
   im %>% 
     isoblur(scale) %>%
     imhessian() %$%
     {scale^2 * (xx * yy - xy^2)}
 }
-
 
 #' Find the coordinates of each blob in the image.
 #'
@@ -68,10 +66,10 @@ with(get_centres(sample_frame, 0.001, scale = 4), points(mx, my, col = "red"))
 
 # multi-level blob detection ----------------------------------------------
 
-max_hessdet <- function( im, scales = seq(from = max(dim(im)[1:2]) %/% 200,
-                                          to = max(dim(im)[1:2]) %/% 8,
-                                          by = 1)
-                         ) {
+max_hessdet <- function(im,
+                        scales = seq(from = max(dim(im)[1:2]) %/% 200,
+                                     to = max(dim(im)[1:2]) %/% 8,
+                                     by = 1)) {
   scales %>%
     map(~ hessdet(im, .)) %>%
     which.parmax()
