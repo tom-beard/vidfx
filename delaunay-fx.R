@@ -113,21 +113,6 @@ deldir_tidy <- function(df) {
   deldir::deldir(df$mx, df$my)
 }
 
-centres_df <- get_centres(sample_frame, threshold = 0.001, scale = 4)
-delaunay <- centres_df %>% deldir_tidy()
-
-sample_frame %>%
-  as.data.frame() %>% 
-  ggplot(aes(x, y)) +
-  geom_raster(aes(fill = value)) +
-  geom_segment(data = delaunay$delsgs, aes(x = x1, y = y1, xend = x2, yend = y2),
-               colour = "yellow", alpha = 0.5) +
-  geom_point(data = centres_df,
-             aes(mx, my), colour = "red") +
-  scale_fill_gradient(low = "black", high = "white") +
-  scale_x_continuous(expand = c(0, 0)) +
-  scale_y_continuous(expand = c(0, 0), trans = scales::reverse_trans())
-
 centres_multiscale_df <- get_multiscale_blobs(sample_frame, threshold = 0.04, scales = seq(12, 100, by = 1))
 delaunay_ms <- centres_multiscale_df %>% deldir_tidy()
 
@@ -138,7 +123,9 @@ sample_frame %>%
   geom_segment(data = delaunay_ms$delsgs, aes(x = x1, y = y1, xend = x2, yend = y2),
                colour = "yellow", alpha = 0.5) +
   geom_point(data = centres_multiscale_df,
-             aes(mx, my), colour = "red") +
+             aes(x = mx, y = my, size = scale_index), colour = "red") +
   scale_fill_gradient(low = "black", high = "white") +
   scale_x_continuous(expand = c(0, 0)) +
   scale_y_continuous(expand = c(0, 0), trans = scales::reverse_trans())
+
+View(delaunay_ms)
