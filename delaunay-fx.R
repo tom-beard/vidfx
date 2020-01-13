@@ -113,8 +113,10 @@ deldir_tidy <- function(df) {
   deldir::deldir(df$mx, df$my)
 }
 
-centres_multiscale_df <- get_multiscale_blobs(sample_frame, threshold = 0.04, scales = seq(12, 100, by = 1))
-delaunay_ms <- centres_multiscale_df %>% deldir_tidy()
+centres_multiscale_df <- get_multiscale_blobs(sample_frame, threshold = 0.04, scales = seq(12, 100, by = 1)) %>% 
+  filter(mx > 1, my > 1, mx < dim(sample_frame)[1], my < dim(sample_frame)[2])
+delaunay_ms <- centres_multiscale_df %>%
+  deldir_tidy()
 
 sample_frame %>%
   as.data.frame() %>% 
@@ -122,6 +124,8 @@ sample_frame %>%
   geom_raster(aes(fill = value)) +
   geom_segment(data = delaunay_ms$delsgs, aes(x = x1, y = y1, xend = x2, yend = y2),
                colour = "yellow", alpha = 0.5) +
+  geom_segment(data = delaunay_ms$dirsgs, aes(x = x1, y = y1, xend = x2, yend = y2),
+               colour = "blue", alpha = 0.5) +
   geom_point(data = centres_multiscale_df,
              aes(x = mx, y = my, size = scale_index), colour = "red") +
   scale_fill_gradient(low = "black", high = "white") +
@@ -129,3 +133,5 @@ sample_frame %>%
   scale_y_continuous(expand = c(0, 0), trans = scales::reverse_trans())
 
 View(delaunay_ms)
+
+delaunay_ms$dirsgs %>% as_tibble()
